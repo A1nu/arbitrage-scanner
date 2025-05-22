@@ -1,39 +1,31 @@
 import asyncio
+import signal
 
-from arbitrage import compare_prices
-from fetchers import ccxt_exchanges, uniswap
+from scheduler import PriceScanner
 
 
 async def main() -> None:
-    # Get prices from all CCXT exchanges
-    exchange_prices = await ccxt_exchanges.get_all_prices()
+    # Create and start the price scanner
+    scanner = PriceScanner(interval=60.0)  # Check prices every 60 seconds
+    scanner.start()
 
-    # Get Uniswap price
-    uniswap_price = await uniswap.get_eth_price()
+    # Set up signal handlers for graceful shutdown
+    loop = asyncio.get_running_loop()
+    stop_event = asyncio.Event()
 
-    # Print all prices
-    print("\nExchange Prices:")
-    for exchange, price in exchange_prices.items():
-        print(f"{exchange.title()} ETH/USDT price: {price}")
-    print(f"Uniswap ETH/USDT price: {uniswap_price}")
+    def handle_signal(sig: signal.Signals) -> None:
+        print(f"\nReceived signal {sig.name}...")
+        stop_event.set()
 
-    # Compare prices between exchanges
-    print("\nArbitrage Opportunities:")
-    exchanges = list(exchange_prices.keys())
-    for i in range(len(exchanges)):
-        for j in range(i + 1, len(exchanges)):
-            exchange_a = exchanges[i]
-            exchange_b = exchanges[j]
-            price_a = exchange_prices[exchange_a]
-            price_b = exchange_prices[exchange_b]
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(sig, lambda s=sig: handle_signal(s))
 
-            arbitrage = compare_prices(exchange_a, price_a, exchange_b, price_b)
-            if arbitrage:
-                print(f"\n{exchange_a.title()} vs {exchange_b.title()}:")
-                print(f"Action: {arbitrage['action']}")
-                print(f"Spread: {arbitrage['spread']}%")
-                print(f"{exchange_a.title()} price: {arbitrage['price_a']}")
-                print(f"{exchange_b.title()} price: {arbitrage['price_b']}")
+    # Wait for stop signal
+    await stop_event.wait()
+
+    # Clean shutdown
+    print("\nShutting down...")
+    scanner.stop()
 
 
 if __name__ == "__main__":
