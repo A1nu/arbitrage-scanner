@@ -1,3 +1,4 @@
+import asyncio
 from typing import Dict, Optional
 
 import ccxt
@@ -10,8 +11,9 @@ async def get_eth_price(exchange_id: str) -> Optional[float]:
     """Get ETH/USDT price from a specific exchange."""
     try:
         exchange = getattr(ccxt, exchange_id)()
-        ticker = await exchange.fetch_ticker("ETH/USDT")
-        await exchange.close()
+        # Run fetch_ticker in a thread pool since it's a blocking operation
+        loop = asyncio.get_running_loop()
+        ticker = await loop.run_in_executor(None, exchange.fetch_ticker, "ETH/USDT")
         return float(ticker["last"])
     except Exception as e:
         print(f"Error fetching price from {exchange_id}: {str(e)}")
