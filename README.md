@@ -31,4 +31,4 @@ python src/main.py
 ## Running Tests
 ```bash
 PYTHONPATH=src python -m unittest discover tests
-``` 
+```

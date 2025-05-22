@@ -1,4 +1,4 @@
 ccxt
 web3
 requests
-python-dotenv 
+python-dotenv
