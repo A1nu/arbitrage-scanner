@@ -1,4 +1,9 @@
-def compare_prices(name_a, price_a, name_b, price_b, threshold=0.001):
+from typing import Dict, Optional, Union
+
+
+def compare_prices(
+    name_a: str, price_a: float, name_b: str, price_b: float, threshold: float = 0.001
+) -> Optional[Dict[str, Union[float, str]]]:
     """
     Compare prices between two sources. If spread exceeds threshold, return arbitrage info.
     """

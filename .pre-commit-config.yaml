@@ -26,7 +26,6 @@ repos:
     rev: v1.8.0
     hooks:
     -   id: mypy
-        additional_dependencies: [types-all]
 
 -   repo: local
     hooks:
@@ -35,4 +34,4 @@ repos:
         entry: pytest
         language: system
         pass_filenames: false
-        always_run: true 
+        always_run: true

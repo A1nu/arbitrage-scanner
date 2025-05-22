@@ -1,3 +1,5 @@
+from typing import Optional
+
 import aiohttp
 
 from config import UNISWAP_API_KEY
@@ -25,7 +27,7 @@ query_template = """
 """
 
 
-async def get_eth_price():
+async def get_eth_price() -> Optional[float]:
     query = query_template % ETH_USDT_POOL_ID
 
     async with aiohttp.ClientSession() as session:

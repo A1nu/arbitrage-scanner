@@ -4,7 +4,7 @@ from arbitrage import compare_prices
 from fetchers import ccxt_exchanges, uniswap
 
 
-async def main():
+async def main() -> None:
     # Get prices from all CCXT exchanges
     exchange_prices = await ccxt_exchanges.get_all_prices()
 
